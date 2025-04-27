@@ -1,0 +1,268 @@
+< !DOCTYPE
+html >
+< html
+lang = "en" >
+< head >
+< meta
+charset = "UTF-8" >
+< meta
+name = "viewport"
+content = "width=device-width, initial-scale=1.0" >
+< title > Scanned
+Document
+Text
+Extractor < / title >
+< style >
+body
+{
+    font - family: Arial, sans - serif;
+margin: 0;
+padding: 0;
+background - color:  # f5f5f5;
+color:  # 333;
+}
+# container {
+max - width: 800
+px;
+margin: 0
+auto;
+padding: 20
+px;
+background - color:  # fff;
+box - shadow: 0
+0
+10
+px
+rgba(0, 0, 0, 0.1);
+border - radius: 8
+px;
+margin - top: 20
+px;
+}
+h1
+{
+text - align: center;
+margin - bottom: 20
+px;
+}
+input[type = "file"] {
+margin - bottom: 20
+px;
+display: none;
+}
+label.upload - button
+{
+display: block;
+width: 200
+px;
+margin: 0
+auto
+10
+px;
+padding: 10
+px
+20
+px;
+background - color:  # 4CAF50;
+color: white;
+text - align: center;
+border: none;
+border - radius: 4
+px;
+cursor: pointer;
+transition: background - color
+0.3
+s;
+}
+label.upload - button: hover
+{
+background - color:  # 45a049;
+}
+button
+{
+display: block;
+width: 200
+px;
+margin: 10
+px
+auto;
+padding: 10
+px
+20
+px;
+background - color:  # 3498db;
+color: white;
+text - align: center;
+border: none;
+border - radius: 4
+px;
+cursor: pointer;
+transition: background - color
+0.3
+s;
+}
+button: hover
+{
+background - color:  # 2980b9;
+}
+table
+{
+border - collapse: collapse;
+width: 100 %;
+margin - top: 20
+px;
+}
+th, td
+{
+border: 1
+px
+solid  # dddddd;
+padding: 8
+px;
+text - align: left;
+}
+th
+{
+background - color:  # f2f2f2;
+}
+# output {
+margin - top: 20
+px;
+text - align: center;
+}
+# preview-container {
+text - align: center;
+display: flex;
+justify - content: center;
+align - items: center;
+margin - top: 20
+px;
+}
+# preview {
+max - width: 100 %;
+max - height: 400
+px;
+border - radius: 8
+px;
+box - shadow: 0
+0
+10
+px
+rgba(0, 0, 0, 0.1);
+display: none;
+}
+# loading {
+display: none;
+text - align: center;
+margin - top: 20
+px;
+}
+# made-by {
+text - align: center;
+margin - top: 20
+px;
+}
+< / style >
+    < / head >
+        < body >
+        < div
+id = "container" >
+     < h1 > Scanned
+Document
+Text
+Extractor < / h1 >
+              < input
+type = "file"
+id = "imageInput"
+accept = "image/*" >
+         < label
+for ="imageInput"
+
+
+class ="upload-button" > Choose Image < / label >
+
+< button
+onclick = "extractText()" > Extract
+Text < / button >
+< div
+id = "output" > < / div >
+< div
+id = "preview-container" >
+< img
+id = "preview" >
+< / div >
+< div
+id = "loading" >
+< img
+src = "https://cdnjs.cloudflare.com/ajax/libs/galleriffic/2.0.1/css/loader.gif"
+alt = "Loading..." >
+< / div >
+< div
+id = "made-by" >
+< p > Made
+by
+Bhavik < / p >
+< / div >
+< / div >
+
+< script >
+function
+extractText()
+{
+    const
+input = document.getElementById('imageInput');
+const
+file = input.files[0];
+
+if (!file)
+{
+    alert("Please select an image file.");
+return;
+}
+
+const
+formData = new
+FormData();
+formData.append('image', file);
+
+document.getElementById('loading').style.display = 'block';
+
+fetch('/extract_text', {
+    method: 'POST',
+    body: formData
+})
+
+.then(response= > response.json())
+.then(data= > {
+    document.getElementById('loading').style.display = 'none';
+const
+tableHtml = generateTableFromJson(data);
+document.getElementById('output').innerHTML = tableHtml;
+document.getElementById('preview').src = URL.createObjectURL(file);
+document.getElementById('preview').style.display = "block";
+});
+}
+
+function
+generateTableFromJson(data)
+{
+    let
+tableHtml = '<table>';
+for (const key in data)
+{
+if (data.hasOwnProperty(key)) {
+const value = data[key];
+tableHtml += '<tr><th>' + key + '</th>';
+if (typeof value == = 'object') {
+tableHtml += '<td>' + generateTableFromJson(value) + '</td></tr>';
+} else {
+tableHtml += '<td>' + value + '</td></tr>';
+}
+}
+}
+tableHtml += '</table>';
+return tableHtml;
+}
+< / script >
+    < / body >
+        < / html >
